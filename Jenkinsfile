@@ -2,10 +2,19 @@ pipeline {
   agent any
   stages {
     stage('Initial') {
-      steps {
-        sh '''echo "Starting Pipeline"
+      parallel {
+        stage('Initial') {
+          steps {
+            sh '''echo "Starting Pipeline"
 '''
-        sh 'echo "Second Step"'
+            sh 'echo "Second Step"'
+          }
+        }
+        stage('S12') {
+          steps {
+            sh 'echo "..!!.."'
+          }
+        }
       }
     }
     stage('Build') {
