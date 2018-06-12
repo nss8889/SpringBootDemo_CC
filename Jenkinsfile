@@ -4,7 +4,6 @@ pipeline {
     stage('Initial') {
       steps {
         sh '''echo "Starting Pipeline"
-mvn -v
 '''
         sh 'echo "Second Step"'
       }
