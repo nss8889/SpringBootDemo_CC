@@ -8,15 +8,21 @@ pipeline {
             sleep 2
           }
         }
-        stage('') {
+        stage('Print') {
           steps {
             echo 'HI'
+          }
+        }
+        stage('sleep') {
+          steps {
+            sleep 2
           }
         }
       }
     }
     stage('Build') {
       steps {
+        echo 'Building'
         sleep 5
       }
     }
