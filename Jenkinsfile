@@ -30,7 +30,7 @@ pipeline {
       steps {
         echo 'Building'
         sleep 5
-        sh 'mvn -version'
+        bat 'mvn -version'
       }
     }
     stage('Deploy') {
