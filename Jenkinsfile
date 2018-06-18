@@ -21,12 +21,6 @@ pipeline {
       }
     }
     stage('Build') {
-      agent {
-        docker {
-          image 'maven:3.5-jdk-8-slim'
-        }
-
-      }
       steps {
         echo 'Building'
         sleep 5
