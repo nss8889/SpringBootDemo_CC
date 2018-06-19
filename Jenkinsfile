@@ -1,35 +1,12 @@
 pipeline {
-  agent any
+  agent { docker {image 'maven:3.3.3' } }
+    
   stages {
-    stage('Initial') {
-      parallel {
-        stage('Initial') {
-          steps {
-            sleep 2
-          }
-        }
-        stage('Print') {
-          steps {
-            echo 'HI'
-          }
-        }
-        stage('sleep') {
-          steps {
-            sleep 2
-          }
-        }
-      }
-    }
-    stage('Build') {
-      steps {
-        echo 'Building'
-        sleep 5
-      }
-    }
-    stage('Deploy') {
-      steps {
-        echo 'Deploying'
-        sh 'whoami'
+      
+    stage('maven'){
+      
+      steps{
+        sh 'maven --version'
       }
     }
   }
