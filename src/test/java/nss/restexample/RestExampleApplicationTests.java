@@ -11,6 +11,13 @@ public class RestExampleApplicationTests {
 
 	@Test
 	public void contextLoads() {
+		System.out.println("contextLoads");
+	}
+
+
+	@Test
+	public void check() {
+		System.out.println("check");
 	}
 
 }

@@ -12,8 +12,14 @@ import java.util.List;
 
 @RestController
 public class MyController {
+	
+	@RequestMapping(value = "/" ,method= RequestMethod.GET)
+    public String home()
+    {
+        return "<html> <body> <h1> <center> Welcome Home </center> </h1> </body> </html>";
+    }
 
-    @RequestMapping(value = "/name" )
+    @RequestMapping(value = "/name" ,	method= RequestMethod.GET)
     public String getName()
     {
         return "John";
