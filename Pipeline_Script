@@ -1,0 +1,69 @@
+node {
+   def mvnHome
+   def deployToProduction
+   
+   //input 'Pipeline has paused and needs your input before proceeding'
+
+   stage('Code checkout') { 
+      git 'https://github.com/nss8889/SpringBootDemo.git'
+   }
+   stage('Timeout Test'){
+       echo 'Started Building'
+        
+        timeout(time: 3, unit: 'SECONDS') {
+        // some block
+        bat 'ping -n 2 127.0.0.1'
+        }
+   }
+   stage('Build') {
+      // Run the maven build
+      //input 'Proceed for build'
+      if (isUnix()) {
+         //sh "'${mvnHome}/bin/mvn' -Dmaven.test.failure.ignore clean package"
+         sh "whoami | date"
+      } else {
+          bat "whoami & date /T & time /T"
+          bat('mvn -Dmaven.test.failure.ignore clean package')
+      }
+   }
+   stage('Unit Testing'){
+       junit '**/target/surefire-reports/TEST-*.xml'
+       publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: ''])
+   }
+   stage('Deployment for staging'){
+                    //  for /f "tokens=5" %a in ('netstat -aon ^| find "[::]:8082" ^| find "LISTENING" ') do echo 'Already Running. Killing task with PID %a' & taskkill /f /pid %a
+       //def command = 'for /f "tokens=5" %a in ('netstat -aon \\^| find "[::]:8082" ^'
+       echo 'command'
+       
+       bat 'start /B java -jar target\\rest-example-0.0.1-SNAPSHOT.jar'
+   }
+   stage('Functional & Integration Testing'){
+       deployToProduction = input message: 'Deploy To Production .....?', ok: 'Proceed To Deploy On Production Environment', parameters: [booleanParam(defaultValue: false, description: '', name: 'Proceed')], submitter: 'navjot', submitterParameter: 'user'
+        echo "$deployToProduction"
+   }
+   stage('Publish to Server'){
+       //sshPublisher(publishers: [sshPublisherDesc(configName: '127.0.0.1', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'whoami | pwd | cat myfile.txt', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '/home/nss', remoteDirectorySDF: false, removePrefix: '', sourceFiles: 'myfile.txt')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+       //sshPublisher(publishers: [sshPublisherDesc(configName: '127.0.0.1', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'll | pwd ', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '/home/nss/jars', remoteDirectorySDF: false, removePrefix: '', sourceFiles: 'my')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+        //sshPublisher(publishers: [sshPublisherDesc(configName: '127.0.0.1', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'll | pwd ', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '/home/nss/jars/temp', remoteDirectorySDF: false, removePrefix: '', sourceFiles: 'myfile.txt')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+        sshPublisher(publishers: [sshPublisherDesc(configName: '127.0.0.1', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'java -jar rest-example-0.0.1-SNAPSHOT.jar', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '/home/nss/jars/deploy/$BUILD_NUMBER', remoteDirectorySDF: false, removePrefix: 'target', sourceFiles: 'target\\rest-example-0.0.1-SNAPSHOT.jar')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+
+        
+        withCredentials([usernamePassword(credentialsId: 'nss-ubuntu', passwordVariable: 'mypass', usernameVariable: 'name')]) {
+            def remote = [:]
+              remote.name = 'NSS-VM-Ubuntu'
+              remote.host = '127.0.0.1'
+              remote.user = name
+              remote.password = mypass
+              remote.port = 2201
+              remote.allowAnyHosts = true
+              echo mypass
+              echo name
+              sshCommand  remote: remote, command: "echo "+mypass+" | sudo -S cat readFile"
+        }
+   }
+   stage('Results') {
+             emailext body: 'Build Deployed', subject: 'Build Deployed', to: 'blue@localhost'
+      //junit '**/target/surefire-reports/TEST-*.xml'
+      //archive 'target/*.jar'
+   }
+}
