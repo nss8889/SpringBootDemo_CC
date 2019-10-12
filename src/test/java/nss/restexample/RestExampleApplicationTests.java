@@ -11,7 +11,6 @@ public class RestExampleApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		int fakeEx = 12345678/0; 
 		System.out.println("contextLoads");
 	}
 
