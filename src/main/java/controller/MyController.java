@@ -16,7 +16,7 @@ public class MyController {
 	@RequestMapping(value = "/" ,method= RequestMethod.GET)
     public String home()
     {
-        return "<html> <body> <h1> <center> Welcome Home </center> </h1> </body> </html>";
+        return "<html> <body> <h1> <center> Welcome Home </center> </h1> </body> </html>"+new java.util.Date();
     }
 
     @RequestMapping(value = "/name" ,	method= RequestMethod.GET)
